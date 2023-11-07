@@ -73,6 +73,8 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
   );
 };
 
+// getStaticPaths siempre necesita el getStaticProps, pero no al revés
+
 export const getStaticPaths: GetStaticPaths = async ctx => {
   const pokemons151 = [...Array(151)].map((value, index) => `${index + 1}`);
 
@@ -80,7 +82,8 @@ export const getStaticPaths: GetStaticPaths = async ctx => {
     paths: pokemons151.map(id => ({
       params: { id },
     })),
-    fallback: false,
+    // fallback: false,
+    fallback: 'blocking',
   };
 };
 
@@ -88,10 +91,23 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // const { data } = await pokeApi.get<PokemonListResponse>('/pokemon?limit=151');
   const { id } = params as { id: string };
 
+  const pokemon = await getPokemonInfo(id);
+
+  if (!pokemon) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
   return {
     props: {
-      pokemon: await getPokemonInfo(id),
+      pokemon,
     },
+    //https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration
+    revalidate: 86400, // en segundos
   };
 };
 

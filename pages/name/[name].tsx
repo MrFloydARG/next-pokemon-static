@@ -81,18 +81,21 @@ export const getStaticPaths: GetStaticPaths = async ctx => {
     paths: pokemonsNames.map(name => ({
       params: { name },
     })),
-    fallback: false,
+    fallback: 'blocking',
   };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  // const { data } = await pokeApi.get<PokemonListResponse>('/pokemon?limit=151');
   const { name } = params as { name: string };
+
+  const pokemon = await getPokemonInfo(name);
 
   return {
     props: {
-      pokemon: await getPokemonInfo(name),
+      pokemon,
     },
+    //https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration
+    revalidate: 86400, // en segundos
   };
 };
 
