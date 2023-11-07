@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
+// Dentro de domains están los sitios que se consideran seguros para obtener imagenes
+
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
-}
+  images: {
+    domains: ['raw.githubusercontent.com'],
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
